@@ -11,8 +11,17 @@
 
 <body>
 
-	<h1>Raspberry camera
-	<a id="snapshot" href="#">Take snapshot</a> &nbsp; <a id="wait">Wait please...</a>  </h1>
+	<h1>Raspberry camera 
+        <span id="hider">
+	  <a id="snapshot" href="#">Take snapshot</a> &nbsp; 
+	  Rotation: 
+		<input id="rotation" type="radio" name="rotation" value="0" checked>0°</input> 
+		<input id="rotation" type="radio" name="rotation" value="90">90°</input>
+		<input id="rotation" type="radio" name="rotation" value="180">180°</input>
+		<input id="rotation" type="radio" name="rotation" value="270">270°</input>
+	  &nbsp; 
+        </span>
+	<a id="wait">Wait please...</a>  </h1>
   <div id="monitor">
 	  <img id="screen" src="blank">
 	</div>

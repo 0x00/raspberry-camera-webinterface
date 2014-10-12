@@ -18,7 +18,15 @@ static_routes = { '/favicon.ico': icon, "/": template, "/styler.css": css, "/bla
 
 lock = False
 cur_image = blank
-def snap():
+
+def timestamp():
+  import datetime
+  display = "%Y-%m-%d-%H-%M-%S"
+  cur_time = datetime.datetime.now()
+  cur_time = cur_time.strftime(display)
+  return cur_time
+
+def snap(rotation):
   global lock, cur_image
   if lock:
     return cur_image
@@ -26,19 +34,23 @@ def snap():
   lock = True
   print "oh hi"
   from subprocess import call
-  import datetime
-  display = "%Y-%m-%d-%H-%M-%S"
-  timestamp = datetime.datetime.now()
-  timestamp = timestamp.strftime(display)
-  print timestamp
 
-  call(["raspistill", "-o", "./snapshots/"+timestamp+".jpg"])
-  cur_image = readfile(timestamp+".jpg", True, "./snapshots/")
+  stamp = timestamp()
+  call(["raspistill", "-o", "./snapshots/"+stamp+".jpg", "--rotation", rotation])
+  cur_image = readfile(stamp+".jpg", True, "./snapshots/")
   lock = False
   return cur_image
 
 dyn_routes = {'/snapshot': snap}
 
+def parameter(name, path):
+  from urlparse import urlparse
+  query = urlparse(path).query
+  for param in query.split("&"):
+    p = param.split("=")
+    if p[0]==name:
+      return str(p[1])
+  return ""
 
 class Handler(BaseHTTPRequestHandler):
   def do_GET(self):
@@ -48,12 +60,13 @@ class Handler(BaseHTTPRequestHandler):
     content = "Um.."
 
     path = self.path.split("?")[0]
+    rotation = parameter("rotation", self.path)
 
     if path in static_routes:
       content = static_routes[path]
 
     if path in dyn_routes:
-      content = dyn_routes[path]()
+      content = dyn_routes[path](rotation)
 
     self.wfile.write(content)
 
